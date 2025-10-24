@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng-public-portal
+    about: View project documentation and overview
+  - name: 💬 General Questions
+    url: https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng-public-portal/discussions
+    about: Ask questions or start a discussion
+  - name: 🐛 Bug Report (requires access)
+    url: https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng/issues
+    about: Report bugs in the main repository (access required)
