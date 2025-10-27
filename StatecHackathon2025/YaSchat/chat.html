@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDMX-MCP-NG Chat Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message.assistant {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .message-text {
+            line-height: 1.5;
+        }
+
+        .message-metadata {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 6px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            max-width: 75px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            max-height: 120px;
+            transition: border-color 0.2s;
+        }
+
+        #messageInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #sendButton {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        #sendButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .example-prompts {
+            padding: 0 20px 20px;
+            background: white;
+        }
+
+        .example-prompts-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .example-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .example-chip {
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-chip:hover {
+            background: #e0e7ff;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .welcome-message h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .welcome-message p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .json-viewer {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .copy-button {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .copy-button:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🚀 SDMX-MCP-NG Chat</h1>
+            <p>Query 873 Luxembourg dataflows with natural language</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span id="statusText">Connected</span>
+            </div>
+        </div>
+
+        <div class="messages" id="messages">
+            <div class="welcome-message">
+                <h2>Welcome to SDMX-MCP-NG! 👋</h2>
+                <p>Ask me anything about Luxembourg's statistical data.<br>
+                Try the example prompts below or type your own query.</p>
+            </div>
+        </div>
+
+        <div class="example-prompts">
+            <div class="example-prompts-title">💡 Example Prompts:</div>
+            <div class="example-chips">
+                <div class="example-chip" onclick="useExample('Get unemployment statistics for 2024')">📊 Unemployment 2024</div>
+                <div class="example-chip" onclick="useExample('Show me employment data for the last 12 months')">💼 Employment Trends</div>
+                <div class="example-chip" onclick="useExample('Find dataflows about labor market')">🔍 Discover Dataflows</div>
+                <div class="example-chip" onclick="useExample('Get data from DF_B3019 for 2024-10 to 2025-10')">⚡ Quick Fetch</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea
+                    id="messageInput"
+                    placeholder="Ask about unemployment, employment, or any Luxembourg statistics..."
+                    rows="1"
+                    onkeydown="handleKeyPress(event)"
+                ></textarea>
+                <button id="sendButton" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const statusText = document.getElementById('statusText');
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function useExample(text) {
+            messageInput.value = text;
+            messageInput.focus();
+            messageInput.style.height = 'auto';
+            messageInput.style.height = (messageInput.scrollHeight) + 'px';
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Clear welcome message
+            const welcomeMsg = document.querySelector('.welcome-message');
+            if (welcomeMsg) welcomeMsg.remove();
+
+            // Add user message
+            addMessage('user', message);
+
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Disable send button and show typing indicator
+            sendButton.disabled = true;
+            const typingIndicator = addTypingIndicator();
+
+            try {
+                statusText.textContent = 'Processing...';
+
+                const response = await fetch('http://localhost:8000/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_request: message
+                    })
+                });
+
+                typingIndicator.remove();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                // Display response (backend returns data directly)
+                addMessage('assistant', formatResponse(result), result);
+
+                statusText.textContent = 'Connected';
+
+            } catch (error) {
+                typingIndicator.remove();
+                addMessage('assistant', `Error: ${error.message}`, null, true);
+                statusText.textContent = 'Error - Check connection';
+                console.error('Error:', error);
+            } finally {
+                sendButton.disabled = false;
+            }
+        }
+
+        function addMessage(type, text, rawData = null, isError = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            if (type === 'user') {
+                contentDiv.innerHTML = `
+                    <div class="message-label">You</div>
+                    <div class="message-text">${escapeHtml(text)}</div>
+                `;
+            } else {
+                const timestamp = new Date().toLocaleTimeString();
+                let content = `<div class="message-label">SDMX-MCP-NG</div>`;
+
+                if (isError) {
+                    content += `<div class="error-message">${escapeHtml(text)}</div>`;
+                } else {
+                    content += `<div class="message-text">${text}</div>`;
+                    if (rawData) {
+                        const jsonStr = JSON.stringify(rawData, null, 2);
+                        content += `
+                            <div style="margin-top: 8px;">
+                                <button class="copy-button" onclick="copyToClipboard(this, ${escapeHtml(JSON.stringify(jsonStr))})">Copy JSON</button>
+                            </div>
+                            <details style="margin-top: 8px;">
+                                <summary style="cursor: pointer; font-size: 12px; color: #64748b;">View raw JSON</summary>
+                                <div class="json-viewer">${escapeHtml(jsonStr)}</div>
+                            </details>
+                        `;
+                    }
+                }
+                content += `<div class="message-metadata">${timestamp}</div>`;
+                contentDiv.innerHTML = content;
+            }
+
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return messageDiv;
+        }
+
+        function addTypingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.className = 'typing-indicator active';
+            indicatorDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+
+            messageDiv.appendChild(indicatorDiv);
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return messageDiv;
+        }
+
+        function formatResponse(result) {
+            // Handle conversational backend response format
+            if (result.extracted_data || result.clarification || result.original_result) {
+                return formatConversationalResponse(result);
+            }
+
+            // Handle direct response (fallback)
+            if (!result.success) {
+                return `<div class="error-message">
+                    ❌ <strong>Error:</strong> ${escapeHtml(result.error || 'Unknown error')}
+                </div>`;
+            }
+
+            let html = '<div><strong>✅ Success!</strong></div>';
+
+            if (result.metadata) {
+                html += `<div style="margin-top: 8px; font-size: 13px; color: #64748b;">
+                    ⚡ Completed in ${result.metadata.duration_seconds}s |
+                    ${result.metadata.successful_steps}/${result.metadata.total_steps} steps
+                </div>`;
+            }
+
+            if (result.plan) {
+                html += `<div style="margin-top: 12px;">
+                    <strong>🎯 Plan:</strong> ${escapeHtml(result.plan.reasoning || '')}
+                </div>`;
+            }
+
+            if (result.execution && result.execution.length > 0) {
+                html += '<div style="margin-top: 12px;"><strong>📊 Results:</strong></div>';
+                result.execution.forEach((step, i) => {
+                    const status = step.status === 'success' ? '✓' : '✗';
+                    html += `<div style="margin-left: 16px; margin-top: 6px; font-size: 13px;">
+                        ${status} Step ${i + 1}: ${escapeHtml(step.description || step.tool)}
+                    </div>`;
+                });
+            }
+
+            return html;
+        }
+
+        function formatConversationalResponse(result) {
+            let html = '';
+
+            const extracted = result.extracted_data || {};
+            const original = result.original_result || {};
+
+            if (!result.success && !original.success) {
+                return `<div class="error-message">
+                    ❌ <strong>Error:</strong> ${escapeHtml(result.error || original.error || 'Unknown error')}
+                </div>`;
+            }
+
+            html += '<div><strong>✅ Success!</strong></div>';
+
+            // Show metadata
+            if (original.metadata) {
+                html += `<div style="margin-top: 8px; font-size: 13px; color: #64748b;">
+                    ⚡ Completed in ${original.metadata.duration_seconds}s |
+                    ${original.metadata.successful_steps}/${original.metadata.total_steps} steps
+                </div>`;
+            }
+
+            // Show extracted data summary
+            if (extracted.summary) {
+                html += `<div style="margin-top: 12px;">
+                    <strong>📊 Data Retrieved:</strong><br>
+                    ${escapeHtml(extracted.summary)}
+                </div>`;
+            }
+
+            // Show dataflows found
+            if (extracted.dataflows && extracted.dataflows.length > 0) {
+                html += '<div style="margin-top: 12px;"><strong>🗂️  Dataflows:</strong></div>';
+                extracted.dataflows.slice(0, 5).forEach((df, i) => {
+                    const name = df.name || df.id || 'Unknown';
+                    const desc = df.description || '';
+                    html += `<div style="margin-left: 16px; margin-top: 6px; font-size: 13px;">
+                        ${i + 1}. ${escapeHtml(name)}<br>
+                        <span style="color: #64748b; font-size: 11px;">${escapeHtml(desc.substring(0, 100))}...</span>
+                    </div>`;
+                });
+                if (extracted.dataflows.length > 5) {
+                    html += `<div style="margin-left: 16px; margin-top: 6px; font-size: 12px; color: #64748b;">
+                        ... and ${extracted.dataflows.length - 5} more
+                    </div>`;
+                }
+            }
+
+            // Show observation stats
+            if (extracted.observations && extracted.observations.length > 0) {
+                const obs = extracted.observations[0];
+                html += `<div style="margin-top: 12px;">
+                    <strong>📈 Data Details:</strong><br>
+                    • ${obs.series_count} series<br>
+                    • ${obs.observation_count} observations
+                </div>`;
+            }
+
+            // Show clarification if needed
+            if (result.clarification) {
+                html += formatClarification(result.clarification);
+            }
+
+            return html;
+        }
+
+        function formatClarification(clarification) {
+            let html = '<div style="margin-top: 16px; padding: 12px; background: #f1f5f9; border-left: 3px solid #667eea; border-radius: 4px;">';
+
+            html += `<strong>💡 ${escapeHtml(clarification.message)}</strong><br>`;
+
+            if (clarification.type === 'select_dataflow' && clarification.options) {
+                html += '<div style="margin-top: 8px; font-size: 13px;">';
+                clarification.options.forEach((opt, i) => {
+                    const name = opt.name || opt.id || 'Unknown';
+                    html += `<div style="margin-top: 4px;">${i + 1}. ${escapeHtml(name)}</div>`;
+                });
+                html += '</div>';
+                html += `<div style="margin-top: 8px; font-size: 12px; color: #64748b;">${escapeHtml(clarification.prompt)}</div>`;
+            }
+
+            if (clarification.type === 'refine_query' && clarification.suggestions) {
+                html += '<ul style="margin-top: 8px; font-size: 13px; margin-left: 20px;">';
+                clarification.suggestions.forEach(sug => {
+                    html += `<li>${escapeHtml(sug)}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return text;
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyToClipboard(button, text) {
+            navigator.clipboard.writeText(JSON.parse(text)).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Check connection on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:8000/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_request: 'ping'})
+                });
+                if (response.ok || response.status < 500) {
+                    statusText.textContent = 'Connected';
+                } else {
+                    statusText.textContent = 'Backend unavailable';
+                }
+            } catch (error) {
+                statusText.textContent = 'Offline - Start backend.py first';
+                console.error('Health check failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>
