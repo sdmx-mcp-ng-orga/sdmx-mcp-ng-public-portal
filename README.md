@@ -4,52 +4,77 @@
 
 ---
 
-## 🎯 About This Portal
+## 🏆 **FOR HACKATHON PARTICIPANTS** 🏆
 
-This is the **public portal** for the **SDMX-MCP-NG** (SDMX Multi-faceted Conversational Platform) project.
+**If you're here for the State Hackathon, start here:**
 
-The main repository is **private** and requires authorized access.
+👉 **[HACKATHON QUICK START GUIDE](HACKATHON_QUICKSTART.md)** 👈
 
-**Use this portal to:**
-- 📋 **Request access** to the private repository
-- 📚 View **public documentation** and project overview
-- 💬 Ask **questions** via discussions
+This guide will get you querying 873 Luxembourg statistical dataflows in under 5 minutes!
+
+**System Status**: ✅ All services operational and ready for the hackathon
 
 ---
 
-## 🔐 How to Get Access
+## 🚀 Quick Start: Deploying the Platform
 
-We grant **read-only** (clone/pull) access to the private source code repository for research, evaluation, or potential collaboration.
+This guide provides the fastest way to get the SDMX-MCP-NG platform running.
 
-### Steps to Request Access:
+### Step 1: Get Access to the Private Repository
 
-**1. Submit an Access Request**
+The main source code is in a private repository. You must be granted access before you can deploy/play with the platform.
 
-Click here: **➡️ [Request Access](https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng-public-portal/issues/new?template=access-request.md)**
+- **[➡️ Click here to fill out the Project Access Request form](https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng-public-portal/issues/new?template=access-request.md)**
+- Wait for approval (typically 1-3 business days) and accept the GitHub invitation you receive via email.
 
-Or manually:
-- Go to the **[Issues tab](https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng-public-portal/issues)**
-- Click **"New issue"**
-- Select the **"Project Access Request"** template
-- Fill out the form with your information
+### Step 2: Clone This Public Portal
 
-**2. Wait for Review**
-- Typical response time: 1-3 business days
-- You'll receive a notification
+Clone this repository to your local machine to get the deployment script.
 
-**3. Accept the Invitation**
-- GitHub will email you an invitation
-- Click the link to join the organization
-- You'll have **Reader** access (clone, pull, issues)
-
-**4. Clone and Use**
 ```bash
-# Using HTTPS
-git clone https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng
-
-# Or using SSH
-git clone git@github.com:sdmx-mcp-ng-orga/sdmx-mcp-ng.git
+git clone https://github.com/sdmx-mcp-ng-orga/sdmx-mcp-ng-public-portal.git
+cd sdmx-mcp-ng-public-portal
 ```
+
+### Step 3: Run the Setup Script
+
+Once you have been granted access, run the setup command. This script will check your permissions and clone the private `sdmx-mcp-ng` repository for you.
+
+```bash
+# Make the script executable
+chmod +x deploy-public-portal.sh
+
+# Run the setup
+./deploy-public-portal.sh setup
+```
+The private repository will be cloned into a new `sdmx-mcp-ng` directory.
+
+### Step 4: Configure API Keys
+
+The platform requires API keys for the LLM provider (like Gemini, Claude, or OpenAI).
+
+1.  Navigate to the private repository: `cd sdmx-mcp-ng`
+2.  Create a `.env` file: `cp .env.example .env`
+3.  Edit the `.env` file (`nano .env`) and add your `PLANNER_LLM_API_KEY` and set a secure `NEO4J_PASSWORD`.
+
+### Step 5: Deploy the Platform
+
+Now you can start all the services using the deployment script.
+
+```bash
+# From the sdmx-mcp-ng-public-portal directory
+./deploy-public-portal.sh dev
+```
+This command starts the entire stack (database, applications, monitoring) in development mode.
+
+### Managing the Environment
+
+Use the wrapper script to manage your deployment:
+
+-   **Stop all services:** `./deploy-public-portal.sh down`
+-   **Check service status:** `./deploy-public-portal.sh status`
+-   **View logs:** `./deploy-public-portal.sh logs`
+-   **Check health:** `./deploy-public-portal.sh health`
 
 ---
 
@@ -59,10 +84,10 @@ An advanced, **AI-driven platform** for interacting with **SDMX** (Statistical D
 
 ### Key Features
 
-- 🗄️ **Neo4j Graph Database** - Efficient metadata storage and querying
+- 🗄️ **Neo4j Graph Database** - Efficient metadata storage and querying. in a future a GraphQL driven architecture could be considred
 - 🤖 **AI-Powered Queries** - Natural language to Cypher using LLMs
 - 🔌 **MCP Protocol** - Standard integration with AI assistants
-- 🚀 **Fast Demo Setup** - Pre-populated backups for quick start
+- 🚀 **Fast Demo Setup** - Pre-populated backups/golden images for quick start
 - 🌍 **Multi-Source Support** - NSIs, ECB, and other SDMX providers
 
 ### Technology Stack
@@ -70,16 +95,8 @@ An advanced, **AI-driven platform** for interacting with **SDMX** (Statistical D
 - **Database:** Neo4j 5.21 with APOC
 - **Backend:** Python 3.10+ with FastMCP
 - **Protocol:** Model Context Protocol (MCP)
-- **AI/LLM:** Gemini, Claude, OpenAI GPT
+- **AI/LLM:** Google Gemini, Anthropic, Claude, OpenAI,Mistral,  Custom
 - **Deployment:** Docker & Docker Compose
-
-### Current Status
-
-**Phase:** LU1 (Luxembourg STATEC Data)
-- ✅ Core infrastructure operational
-- ✅ 873 LU1 dataflows in Neo4j
-- ✅ MCP services running
-- ✅ Text2Cypher with multiple LLM providers
 
 ---
 
@@ -124,13 +141,10 @@ Full documentation is available in the private repository after access is grante
 ## ❓ FAQ
 
 **Q: Is this open source?**
-A: No, it's a private repository with controlled access.
+A: Yes in the future,  meanwhile for the moment the private repository is with controlled access  in order to refine (sdmx-graph db schema mapping, LLM Agentic Architecture, golden image to accelerate the deployment process ...) .
 
 **Q: How long does approval take?**
-A: Typically 1-3 business days.
-
-**Q: What if I'm declined?**
-A: You'll receive feedback. You can reapply after addressing concerns.
+A: Typically 1-2 business days.
 
 **Q: Can I redistribute the code?**
 A: No, others must request their own access.
@@ -142,7 +156,7 @@ A: No, access is free for legitimate use cases (research, development, evaluatio
 
 ## 📜 License
 
-Private repository - license details available after access is granted.
+The code in the private repository has its own license, which is available after access is granted. This public portal repository is under the MIT License.
 
 ---
 
