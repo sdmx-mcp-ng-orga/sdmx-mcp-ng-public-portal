@@ -22,10 +22,16 @@ We've built a **conversational AI chat interface** that lets you query 873 Luxem
 
 **What you can do**:
 
-- 💬 Ask questions in plain English
+- 💬 Ask questions in **multiple languages**: English, German (Deutsch), French (Français), Luxembourgish (Lëtzebuergesch), and more!
 - 📊 Get real SDMX data in 3-8 seconds
 - 🔍 Discover 873 Luxembourg dataflows
 - 📈 Analyze employment, GDP, prices, population data
+
+**Example queries**:
+- 🇬🇧 "Get unemployment statistics for 2024"
+- 🇩🇪 "Zeige mir Arbeitslosigkeitsdaten für 2024"
+- 🇫🇷 "Donne-moi les statistiques de chômage pour 2024"
+- 🇱🇺 "Gëtt mir d'Aarbechtsloosenzuelen fir 2024"
 
 **System Status**: ✅ All services operational and ready!
 
