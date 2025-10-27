@@ -6,13 +6,28 @@
 
 ## 🏆 **FOR HACKATHON PARTICIPANTS** 🏆
 
-**If you're here for the State Hackathon, start here:**
+**Welcome to the State Hackathon 2025!**
 
-👉 **[HACKATHON QUICK START GUIDE](HACKATHON_QUICKSTART.md)** 👈
+### 🚀 Try the Chat Interface
 
-This guide will get you querying 873 Luxembourg statistical dataflows in under 5 minutes!
+We've built a **conversational AI chat interface** that lets you query 873 Luxembourg statistical dataflows using natural language!
 
-**System Status**: ✅ All services operational and ready for the hackathon
+👉 **[YaSchat - Chat Interface](StatecHackathon2025/YaSchat/)** 👈
+
+**Quick Start**:
+
+1. See [Chat Interface README](StatecHackathon2025/YaSchat/CHAT_INTERFACE_README.md)
+2. Browse [Query Examples](StatecHackathon2025/QUICK_REFERENCE_QUERIES.md)
+3. Read [Hackathon Proposal](StatecHackathon2025/statechackathon.md)
+
+**What you can do**:
+
+- 💬 Ask questions in plain English
+- 📊 Get real SDMX data in 3-8 seconds
+- 🔍 Discover 873 Luxembourg dataflows
+- 📈 Analyze employment, GDP, prices, population data
+
+**System Status**: ✅ All services operational and ready!
 
 ---
 
